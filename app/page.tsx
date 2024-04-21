@@ -1,95 +1,56 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import { Canvas } from "@react-three/fiber";
+import { Bayan } from "../characters/Bayan";
+import { Suspense, useState } from "react";
+import Loader from "./loader";
+
+const adjustContainerModelForScreenSize = () => {
+  let screenScale = null;
+  let screenPosition = [0, -6.5, -43];
+  let rotation = [0.1, 4.7, 0];
+
+  if (window.innerWidth < 768) {
+    screenScale = [10, 10, 10];
+  } else {
+    screenScale = [20, 20, 20];
+  }
+
+  return [screenScale, screenPosition, rotation];
+};
 
 export default function Home() {
+  const [isRotating, setRotating] = useState(false);
+
+  const [containerScale, containerPosition, containerRotation] =
+    adjustContainerModelForScreenSize();
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    <section className="relative w-full h-screen">
+      <Canvas
+        className={`w-full h-screen bg-transparent ${
+          isRotating ? "cursor-grabbing" : "cursor-grab"
+        }`}
+        camera={{ near: 0.1, far: 1000 }}
+      >
+        <Suspense fallback={<Loader />}>
+          <directionalLight position={[1, 1, 1]} intensity={2} />
+          <ambientLight intensity={0.5} />
+          <hemisphereLight
+            skyColor="#b1e1ff"
+            groundColor="#000000"
+            intensity={1}
+          />
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+          <Bayan
+            position={containerPosition}
+            scale={containerScale}
+            rotation={containerRotation}
+            isRotating={isRotating}
+            setRotating={setRotating}
+          />
+        </Suspense>
+      </Canvas>
+    </section>
   );
 }
