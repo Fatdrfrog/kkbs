@@ -1,8 +1,8 @@
 "use client";
 
-import { Canvas } from "@react-three/fiber";
+import { Canvas,useFrame } from "@react-three/fiber";
 import { Bayan } from "../characters/Bayan";
-import { Suspense, useState } from "react";
+import { Suspense, useState,useRef} from "react";
 import Loader from "./loader";
 
 const adjustContainerModelForScreenSize = () => {
@@ -18,6 +18,27 @@ const adjustContainerModelForScreenSize = () => {
 
   return [screenScale, screenPosition, rotation];
 };
+
+function Floor(props) {
+  
+  const meshRef = useRef()
+
+  const [hovered, setHover] = useState(false)
+  const [active, setActive] = useState(false)
+
+  return (
+    <mesh
+      {...props}
+      ref={meshRef}
+      scale={1}
+      onClick={(event) => setActive(!active)}
+      onPointerOver={(event) => setHover(true)}
+      onPointerOut={(event) => setHover(false)}>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color={hovered ? 'orange' : 'green'} />
+    </mesh>
+  )
+}
 
 export default function Home() {
   const [isRotating, setRotating] = useState(false);
@@ -36,19 +57,15 @@ export default function Home() {
         <Suspense fallback={<Loader />}>
           <directionalLight position={[1, 1, 1]} intensity={2} />
           <ambientLight intensity={0.5} />
-          <hemisphereLight
-            skyColor="#b1e1ff"
-            groundColor="#000000"
-            intensity={1}
-          />
+          <Floor position={[0, -2, 0]}/>
 
-          <Bayan
+          {/* <Bayan
             position={containerPosition}
             scale={containerScale}
             rotation={containerRotation}
             isRotating={isRotating}
             setRotating={setRotating}
-          />
+          /> */}
         </Suspense>
       </Canvas>
     </section>
